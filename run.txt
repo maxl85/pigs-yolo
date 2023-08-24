@@ -1,6 +1,7 @@
 python -m venv venv
 venv\Scripts\activate.ps1
 
+uvicorn main:app --reload --host 0.0.0.0 --port 8001
 
 
 docker build --tag "yolo-api" .
@@ -8,4 +9,9 @@ docker compose up
 
 docker exec -it yolo-api bash
 
-uvicorn main:app --reload --host 0.0.0.0 --port 8001
+git pull
+docker build --tag "yolo-api" .
+
+docker tag yolo-api maxl85/yolo-api:latest
+docker push maxl85/yolo-api:latest
+

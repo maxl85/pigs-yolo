@@ -1,7 +1,7 @@
 version: '3.9'
 services:
   yolo-api:
-    image: yolo-api
+    image: maxl85/yolo-api:latest
     container_name: yolo-api
     restart: "always"
     env_file:
