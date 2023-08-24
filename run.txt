@@ -5,7 +5,8 @@ uvicorn main:app --reload --host 0.0.0.0 --port 8001
 
 
 docker build --tag "yolo-api" .
-docker compose up
+docker compose up -d
+docker compose logs -f
 
 docker exec -it yolo-api bash
 
