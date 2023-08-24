@@ -1,0 +1,6 @@
+ultralytics
+uvicorn[standard]
+gunicorn
+fastapi[all]
+python-multipart
+requests
