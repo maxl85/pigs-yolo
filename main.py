@@ -76,7 +76,7 @@ def object_detection(file: UploadFile, camId: str = Form(...), dateTime: str = F
     
     input_image = Image.open(io.BytesIO(file.file.read())).convert("RGB")
     
-    res = yolo_model.predict(input_image, float(os.environ["YOLO_CONF"]), classes=0)
+    res = yolo_model.predict(input_image, conf=float(os.environ["YOLO_CONF"]), classes=0)
     plot_res = res[0].plot(labels=False)
     
     cv2.imwrite(predicted_img, plot_res)
