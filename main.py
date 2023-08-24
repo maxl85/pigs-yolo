@@ -11,9 +11,13 @@ from fastapi import FastAPI, File, Form, UploadFile, status
 from fastapi.responses import RedirectResponse
 from fastapi.middleware.cors import CORSMiddleware
 
-directory = './predicted/'
-if not os.path.exists(directory):
-    os.makedirs(directory)
+directory_found = './predicted/found/'
+if not os.path.exists(directory_found):
+    os.makedirs(directory_found)
+
+directory_not_found = './predicted/notfound/'
+if not os.path.exists(directory_not_found):
+    os.makedirs(directory_not_found)
 
 AUTH_TOKEN = os.environ["AUTH_TOKEN"]
 API_FILES_UPLOAD = os.environ["API_FILES_UPLOAD"]
@@ -74,7 +78,7 @@ async def redirect():
 
 @app.post("/object_detection", status_code=status.HTTP_201_CREATED)
 def object_detection(file: UploadFile, camId: str = Form(...), dateTime: str = Form(...)):
-    predicted_img = directory + file.filename
+    
     
     input_image = Image.open(io.BytesIO(file.file.read())).convert("RGB")
     
@@ -82,6 +86,7 @@ def object_detection(file: UploadFile, camId: str = Form(...), dateTime: str = F
     plot_res = res[0].plot(labels=False)
     
     if (len(res[0].boxes.cls) > 0):
+        predicted_img = directory_found + file.filename
         cv2.imwrite(predicted_img, plot_res)
         headers = {'Authorization': 'Bearer {}'.format(AUTH_TOKEN)}
         file = {'file': open(predicted_img,'rb')}
@@ -89,6 +94,8 @@ def object_detection(file: UploadFile, camId: str = Form(...), dateTime: str = F
         res = requests.post(API_FILES_UPLOAD, headers=headers, files=file, data=data)
         return 'Found'
     else:
+        predicted_img = directory_not_found + file.filename
+        cv2.imwrite(predicted_img, plot_res)
         return 'Not found'
     
     
