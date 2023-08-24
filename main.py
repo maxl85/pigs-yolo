@@ -15,11 +15,13 @@ directory = './predicted/'
 if not os.path.exists(directory):
     os.makedirs(directory)
 
+AUTH_TOKEN = os.environ["AUTH_TOKEN"]
+API_FILES_UPLOAD = os.environ["API_FILES_UPLOAD"]
+
 ########################### YOLO ################################
 
 # Initialize the models
 yolo_model = YOLO(os.environ["YOLO_MODEL"])
-
 
 ###################### FastAPI Setup #############################
 
@@ -79,15 +81,14 @@ def object_detection(file: UploadFile, camId: str = Form(...), dateTime: str = F
     res = yolo_model.predict(input_image, conf=float(os.environ["YOLO_CONF"]), classes=0)
     plot_res = res[0].plot(labels=False)
     
-    cv2.imwrite(predicted_img, plot_res)
+    if (len(res[0].boxes.cls) > 0):
+        cv2.imwrite(predicted_img, plot_res)
+        headers = {'Authorization': 'Bearer {}'.format(AUTH_TOKEN)}
+        file = {'file': open(predicted_img,'rb')}
+        data = {'camId': camId, 'dateTime': dateTime}
+        res = requests.post(API_FILES_UPLOAD, headers=headers, files=file, data=data)
+        return 'Found'
+    else:
+        return 'Not found'
     
-    # API сервера
-    AUTH_TOKEN = os.environ["AUTH_TOKEN"]
-    API_FILES_UPLOAD = os.environ["API_FILES_UPLOAD"]
     
-    headers = {'Authorization': 'Bearer {}'.format(AUTH_TOKEN)}
-    file = {'file': open(predicted_img,'rb')}
-    data = {'camId': camId, 'dateTime': dateTime}
-    res = requests.post(API_FILES_UPLOAD, headers=headers, files=file, data=data)    
-    
-    return 'Everything OK!'
