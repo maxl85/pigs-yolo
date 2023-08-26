@@ -16,6 +16,10 @@ directory_found = './predicted/found/'
 if not os.path.exists(directory_found):
     os.makedirs(directory_found)
 
+directory_found_input = './predicted/found/input/'
+if not os.path.exists(directory_found_input):
+    os.makedirs(directory_found_input)
+
 directory_not_found = './predicted/notfound/'
 if not os.path.exists(directory_not_found):
     os.makedirs(directory_not_found)
@@ -103,8 +107,8 @@ def plot_rectangle(img, res):
 @app.post("/object_detection", status_code=status.HTTP_201_CREATED)
 def object_detection(file: UploadFile, camId: str = Form(...), dateTime: str = Form(...)):
     
-    img1 = Image.open(io.BytesIO(file.file.read())).convert("RGB")
-    img1 = np.array(img1)
+    input_img = Image.open(io.BytesIO(file.file.read())).convert("RGB")
+    img1 = np.array(input_img)
     
     if (camId == 'cam1_1'):
         img1m = cv2.bitwise_and(img1, img1, mask = mask_cam1_1_yolo)
@@ -124,7 +128,8 @@ def object_detection(file: UploadFile, camId: str = Form(...), dateTime: str = F
     
     if (len(res[0].boxes.cls) > 0):
         predicted_img = directory_found + file.filename
-        cv2.imwrite(predicted_img, img1)
+        cv2.imwrite(predicted_img, plot_res)
+        input_img.save(directory_found_input + + file.filename)
         headers = {'Authorization': 'Bearer {}'.format(AUTH_TOKEN)}
         file = {'file': open(predicted_img,'rb')}
         data = {'camId': camId, 'dateTime': dateTime}
@@ -132,7 +137,7 @@ def object_detection(file: UploadFile, camId: str = Form(...), dateTime: str = F
         return 'Found'
     else:
         predicted_img = directory_not_found + file.filename
-        cv2.imwrite(predicted_img, img1)
+        cv2.imwrite(predicted_img, plot_res)
         return 'Not found'
     
     
