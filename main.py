@@ -120,6 +120,7 @@ def object_detection(file: UploadFile, camId: str = Form(...), dateTime: str = F
         plot_res = plot_rectangle(img1, res)
     else:
         plot_res = img1
+    plot_res = cv2.cvtColor(plot_res, cv2.COLOR_BGR2RGB)
     
     if (len(res[0].boxes.cls) > 0):
         predicted_img = directory_found + file.filename
@@ -131,6 +132,7 @@ def object_detection(file: UploadFile, camId: str = Form(...), dateTime: str = F
         return 'Found'
     else:
         predicted_img = directory_not_found + file.filename
+        
         cv2.imwrite(predicted_img, plot_res)
         return 'Not found'
     
