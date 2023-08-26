@@ -12,6 +12,22 @@ from fastapi import FastAPI, File, Form, UploadFile, status
 from fastapi.responses import RedirectResponse
 from fastapi.middleware.cors import CORSMiddleware
 
+dir_cam1_1 = './predicted/cam1_1/'
+if not os.path.exists(dir_cam1_1):
+    os.makedirs(dir_cam1_1)
+
+dir_cam1_2 = './predicted/cam1_2/'
+if not os.path.exists(dir_cam1_2):
+    os.makedirs(dir_cam1_2)
+
+dir_cam2_1 = './predicted/cam2_1/'
+if not os.path.exists(dir_cam2_1):
+    os.makedirs(dir_cam2_1)
+
+dir_cam2_2 = './predicted/cam2_2/'
+if not os.path.exists(dir_cam2_2):
+    os.makedirs(dir_cam2_2)
+
 directory_found = './predicted/found/'
 if not os.path.exists(directory_found):
     os.makedirs(directory_found)
@@ -112,12 +128,16 @@ def object_detection(file: UploadFile, camId: str = Form(...), dateTime: str = F
     
     if (camId == 'cam1_1'):
         img1m = cv2.bitwise_and(img1, img1, mask = mask_cam1_1_yolo)
+        input_img.save(dir_cam1_1 + file.filename)
     if (camId == 'cam1_2'):
         img1m = cv2.bitwise_and(img1, img1, mask = mask_cam1_2_yolo)
+        input_img.save(dir_cam1_2 + file.filename)
     if (camId == 'cam2_1'):
         img1m = cv2.bitwise_and(img1, img1, mask = mask_cam2_1_yolo)
+        input_img.save(dir_cam2_1 + file.filename)
     if (camId == 'cam2_2'):
         img1m = cv2.bitwise_and(img1, img1, mask = mask_cam2_2_yolo)
+        input_img.save(dir_cam2_2 + file.filename)
     
     res = yolo_model.predict(img1m, conf=float(os.environ["YOLO_CONF"]), classes=0)
     if (len(res[0].boxes.xyxy) > 0):

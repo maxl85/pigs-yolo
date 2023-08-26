@@ -10,6 +10,7 @@ docker compose logs -f
 
 docker exec -it yolo-api bash
 
+docker compose stop
 git pull
 docker build --tag "yolo-api" .
 
@@ -20,4 +21,4 @@ docker push maxl85/yolo-api:latest
 find . -name "2023-08-24*.jpg" -type f
 sudo find . -name "2023-08-24*.jpg" -type f -delete
 
-scp -r user@51.250.100.147:/home/user/predicted/found  C:\\111
+scp -r user@51.250.100.147:/home/user/predicted/  C:\\111
