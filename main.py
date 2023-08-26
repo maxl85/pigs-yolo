@@ -129,7 +129,7 @@ def object_detection(file: UploadFile, camId: str = Form(...), dateTime: str = F
     if (len(res[0].boxes.cls) > 0):
         predicted_img = directory_found + file.filename
         cv2.imwrite(predicted_img, plot_res)
-        input_img.save(directory_found_input + + file.filename)
+        input_img.save(directory_found_input + file.filename)
         headers = {'Authorization': 'Bearer {}'.format(AUTH_TOKEN)}
         file = {'file': open(predicted_img,'rb')}
         data = {'camId': camId, 'dateTime': dateTime}
