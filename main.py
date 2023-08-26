@@ -114,7 +114,7 @@ def object_detection(file: UploadFile, camId: str = Form(...), dateTime: str = F
         img1m = cv2.bitwise_and(img1, img1, mask = mask_cam2_1_yolo)
     if (camId == 'cam2_2'):
         img1m = cv2.bitwise_and(img1, img1, mask = mask_cam2_2_yolo)
-        
+    
     res = yolo_model.predict(img1m, conf=float(os.environ["YOLO_CONF"]), classes=0)
     if (len(res[0].boxes.xyxy) > 0):
         plot_res = plot_rectangle(img1, res)
@@ -132,7 +132,6 @@ def object_detection(file: UploadFile, camId: str = Form(...), dateTime: str = F
         return 'Found'
     else:
         predicted_img = directory_not_found + file.filename
-        
         cv2.imwrite(predicted_img, plot_res)
         return 'Not found'
     
