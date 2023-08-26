@@ -3,6 +3,7 @@ import os
 import json
 import requests
 from PIL import Image
+import numpy as np
 
 import cv2
 from ultralytics import YOLO
@@ -103,6 +104,7 @@ def plot_rectangle(img, res):
 def object_detection(file: UploadFile, camId: str = Form(...), dateTime: str = Form(...)):
     
     img1 = Image.open(io.BytesIO(file.file.read())).convert("RGB")
+    img1 = np.array(img1)
     
     if (camId == 'cam1_1'):
         img1m = cv2.bitwise_and(img1, img1, mask = mask_cam1_1_yolo)
