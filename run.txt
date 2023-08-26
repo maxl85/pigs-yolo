@@ -16,3 +16,8 @@ docker build --tag "yolo-api" .
 docker tag yolo-api maxl85/yolo-api:latest
 docker push maxl85/yolo-api:latest
 
+
+find . -name "2023-08-12*.jpg" -type f
+sudo find . -name "2023-08-12*.jpg" -type f -delete
+
+scp -r user@51.250.100.147:/home/user/predicted/found  C:\\111
