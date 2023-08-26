@@ -97,7 +97,7 @@ def plot_rectangle(img, res):
     img1 = img
     (x1, y1) = (int(res[0].boxes.xyxy[0][0]), int(res[0].boxes.xyxy[0][1]))
     (x2, y2) = (int(res[0].boxes.xyxy[0][2]), int(res[0].boxes.xyxy[0][3]))
-    cv2.rectangle(img1, (x1, y1), (x2, y2), (0, 0, 255), 2)
+    cv2.rectangle(img1, (x1, y1), (x2, y2), (255, 0, 0), 2)
     return img1
 
 @app.post("/object_detection", status_code=status.HTTP_201_CREATED)
