@@ -1,5 +1,6 @@
 python -m venv venv
 venv\Scripts\activate.ps1
+pip install -r requirements.txt
 
 uvicorn main:app --reload --host 0.0.0.0 --port 8001
 
@@ -16,6 +17,8 @@ docker build --tag "yolo-api" .
 
 docker tag yolo-api maxl85/yolo-api:latest
 docker push maxl85/yolo-api:latest
+
+docker logs -f nestjs-api
 
 
 find . -name "2023-08-24*.jpg" -type f

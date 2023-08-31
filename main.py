@@ -1,9 +1,8 @@
-import io
 import os
 import json
 import requests
-from PIL import Image
 import numpy as np
+from datetime import datetime
 
 import cv2
 from ultralytics import YOLO
@@ -47,6 +46,7 @@ API_FILES_UPLOAD = os.environ["API_FILES_UPLOAD"]
 
 # Initialize the models
 yolo_model = YOLO(os.environ["YOLO_MODEL"])
+# yolo_model = YOLO('yolov8x.pt')
 
 mask_cam1_1_yolo = cv2.imread("./mask/mask_cam1_1_yolo.jpg")
 mask_cam1_1_yolo = cv2.cvtColor(mask_cam1_1_yolo, cv2.COLOR_BGR2GRAY)
@@ -117,39 +117,45 @@ def plot_rectangle(img, res):
     img1 = img
     (x1, y1) = (int(res[0].boxes.xyxy[0][0]), int(res[0].boxes.xyxy[0][1]))
     (x2, y2) = (int(res[0].boxes.xyxy[0][2]), int(res[0].boxes.xyxy[0][3]))
-    cv2.rectangle(img1, (x1, y1), (x2, y2), (255, 0, 0), 2)
+    cv2.rectangle(img1, (x1, y1), (x2, y2), (0, 0, 255), 2)
     return img1
 
 @app.post("/object_detection", status_code=status.HTTP_201_CREATED)
 def object_detection(file: UploadFile, camId: str = Form(...), dateTime: str = Form(...)):
-    
-    input_img = Image.open(io.BytesIO(file.file.read())).convert("RGB")
-    img1 = np.array(input_img)
+    contents = file.file.read()
+    nparr = np.fromstring(contents, np.uint8)
+    input_img = cv2.imdecode(nparr, cv2.IMREAD_COLOR)
+    img1 = input_img.copy()
     
     if (camId == 'cam1_1'):
         img1m = cv2.bitwise_and(img1, img1, mask = mask_cam1_1_yolo)
-        input_img.save(dir_cam1_1 + file.filename)
+        cv2.imwrite(dir_cam1_1 + file.filename, input_img)
     if (camId == 'cam1_2'):
         img1m = cv2.bitwise_and(img1, img1, mask = mask_cam1_2_yolo)
-        input_img.save(dir_cam1_2 + file.filename)
+        cv2.imwrite(dir_cam1_2 + file.filename, input_img)
     if (camId == 'cam2_1'):
         img1m = cv2.bitwise_and(img1, img1, mask = mask_cam2_1_yolo)
-        input_img.save(dir_cam2_1 + file.filename)
+        cv2.imwrite(dir_cam2_1 + file.filename, input_img)
     if (camId == 'cam2_2'):
         img1m = cv2.bitwise_and(img1, img1, mask = mask_cam2_2_yolo)
-        input_img.save(dir_cam2_2 + file.filename)
+        cv2.imwrite(dir_cam2_2 + file.filename, input_img)
+    
     
     res = yolo_model.predict(img1m, conf=float(os.environ["YOLO_CONF"]), classes=0)
+    # res = yolo_model.predict(img1m, conf=0.3, classes=0)
+    print(datetime.now().strftime("%Y-%m-%d %H:%M:%S"))
+    
     if (len(res[0].boxes.xyxy) > 0):
         plot_res = plot_rectangle(img1, res)
     else:
         plot_res = img1
-    plot_res = cv2.cvtColor(plot_res, cv2.COLOR_BGR2RGB)
+    # plot_res = cv2.cvtColor(plot_res, cv2.COLOR_BGR2RGB)
     
     if (len(res[0].boxes.cls) > 0):
         predicted_img = directory_found + file.filename
         cv2.imwrite(predicted_img, plot_res)
-        input_img.save(directory_found_input + file.filename)
+        cv2.imwrite(directory_found_input + file.filename, input_img)
+        
         headers = {'Authorization': 'Bearer {}'.format(AUTH_TOKEN)}
         file = {'file': open(predicted_img,'rb')}
         data = {'camId': camId, 'dateTime': dateTime}
